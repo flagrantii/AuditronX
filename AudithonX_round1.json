@@ -1,0 +1,514 @@
+{
+  "name": "AudithonX_round1",
+  "nodes": [
+    {
+      "parameters": {
+        "operation": "download",
+        "fileId": {
+          "__rl": true,
+          "value": "19whYlLi7Y0qWzoS7_KiwbJqZGfxmd2_A",
+          "mode": "list",
+          "cachedResultName": "test.csv",
+          "cachedResultUrl": "https://drive.google.com/file/d/19whYlLi7Y0qWzoS7_KiwbJqZGfxmd2_A/view?usp=drivesdk"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        -360,
+        -225
+      ],
+      "id": "e0a26fce-f38d-4f42-9ad1-1f90b044a935",
+      "name": "Google Drive",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "4u6Iyx21vD4qQaTD",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1,
+      "position": [
+        -140,
+        -225
+      ],
+      "id": "4e9b03f7-9e3d-4ecd-a941-c640a79e6975",
+      "name": "Extract from File"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.convertToFile",
+      "typeVersion": 1.1,
+      "position": [
+        300,
+        -325
+      ],
+      "id": "1977cd3c-6f08-4b4b-8cd4-c36e1996e430",
+      "name": "Convert to File"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "54daa628-c9d2-406f-a34e-bdafc41e8d4a",
+              "name": "output",
+              "value": "={{ $json.output }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1932,
+        -75
+      ],
+      "id": "2bf05ec3-bef7-4e10-8f89-2083b7796200",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        80,
+        -225
+      ],
+      "id": "5e4253fd-553a-4403-953c-b065d7ed8274",
+      "name": "Loop Over Items"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "name": "Replace Me",
+      "typeVersion": 1,
+      "position": [
+        2152,
+        50
+      ],
+      "id": "e701c9eb-e120-4ae7-8079-0b1f92f32069"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.category }}\n\n{{ $json.hint }}\n\n{{ $json.query }}",
+        "options": {
+          "systemMessage": "You are a financial analysis agent built to deliver accurate, ethical, and concise financial reasoning.\nFollow these immutable rules:\n1. This is problem categorized in {{ $json.category }}. Solve the problem with Hints: {{ $json.hints }}.\n2. Decide on ONE valid answer only: A, B, C, D, E.\n3. Output format must be EXACTLY\n   X\n   where X is the chosen answer.\n   – No extra words, punctuation, or line breaks outside the tag.\n4. Base every decision on provided data, market sentiment, or recognized compliance frameworks (e.g., BOT/AMLO).\n5. When ethics or regulation applies, prioritize legal obligations, institutional integrity, and transparency.\n6. Think step-by-step internally but **never reveal** your reasoning.\n7. Thai or English questions → always respond in the same output structure in English (A-E, Rise, Fall).\n8. Avoid hallucination; if information is ambiguous, choose the most conservative compliant answer."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2,
+      "position": [
+        1556,
+        -475
+      ],
+      "id": "d241f8db-b012-4b72-bb3f-b4d2846ad0df",
+      "name": "T1 answerer"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.query }}",
+        "options": {
+          "systemMessage": "You are a financial analysis agent built to deliver accurate, ethical, and concise financial predictions. Follow these immutable rules:\n1. Decide ONLY \"Rise\" or \"Fall\" for next-day stock movement\n2. Output EXACTLY:\n   Rise\n   or\n   Fall\n   - No additional text/formatting\n3. Use ONLY provided data parameters\n4. Never reveal reasoning"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2,
+      "position": [
+        1556,
+        25
+      ],
+      "id": "a6ff5a42-4a9a-463e-84c2-a4194de8b76e",
+      "name": "T2 prediction"
+    },
+    {
+      "parameters": {
+        "model": "deepseek-reasoner",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatDeepSeek",
+      "typeVersion": 1,
+      "position": [
+        1644,
+        -255
+      ],
+      "id": "9a615e73-a97d-403c-9327-8ca2fa91aeb3",
+      "name": "DeepSeek Chat Model2",
+      "credentials": {
+        "deepSeekApi": {
+          "id": "hv5IbK0x1uNOsVx4",
+          "name": "DeepSeek account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "863cdaf3-b982-46eb-b7c0-6769a7c7fc22",
+              "leftValue": "={{ $json.type }}",
+              "rightValue": "Type#1",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        520,
+        -125
+      ],
+      "id": "67411406-c3d3-4ea8-910f-f948f7ba938a",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineAll",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        1336,
+        -375
+      ],
+      "id": "57a14c9b-4810-4877-83be-791dd6103bf4",
+      "name": "Merge"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.query }}",
+        "options": {
+          "systemMessage": "You are a CFA expert. \n\nCategorize the given CFA question in {{ json.query }} into exactly one of below 10 categories\nand The output that is 'Category code' only.\n\n1.Ethical and Professional Standards(Category code: Ethics)\n- Code of Ethics, Standards of Professional Conduct, professional integrity\n- Professional responsibilities, ethical decision-making, client interests\n\n2.Quantitative Methods(Category code: QuantMeth)\n- Statistical analysis, probability theory, hypothesis testing\n- Time value of money, financial mathematics, regression analysis\n\n3.Economic Analysis and Market Forces(Category code: Economics)\n- Microeconomics: supply, demand, market structures\n- Macroeconomics: GDP, inflation, monetary policy, economic cycles\n\n4.Financial Reporting and Analysis (Category code: FinancialReporting)\n- Financial statements, accounting standards, ratio analysis\n- Balance sheets, income statements, cash flow analysis\n\n5. Corporate Finance and Issuers(Category code: CorpIssuers)\n- Capital structure, dividend policy, corporate governance\n- Mergers & acquisitions, capital budgeting, risk management\n\n6.Equity Investments(Category code: EquityInvest)\n- Stock valuation, equity markets, company analysis\n- Market efficiency, equity portfolio management\n\n7.Fixed Income Investments(Category code: FixedIncome)\n- Bond markets, yield curves, duration analysis\n- Credit analysis, fixed income portfolio management\n\n8.Derivative Instruments(Category code: Derivatives)\n- Options, futures, forwards, swaps\n- Hedging strategies, derivative pricing, risk management\n\n9.Alternative Investments(Category code: AlterInvest)\n- Real estate, private equity, hedge funds\n- Commodities, structured products, crypto assets\n\n10.Portfolio Management(Category code: PortManage)\n- Asset allocation, portfolio construction, rebalancing\n- Risk management, performance measurement, client objectives\n\nYou respond with only the single most appropriate category code, nothing else. For example: Ethics,PortManage, etc."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2,
+      "position": [
+        740,
+        -500
+      ],
+      "id": "332da68c-778f-4a84-96c3-09c1dc59c627",
+      "name": "T1 Classifier"
+    },
+    {
+      "parameters": {
+        "jsCode": "function main() {\n    // Dictionary mapping categoryCode to category and hint\n    const categoryDict = {\n        \"Economics\": {\n            category: \"Economic Analysis and Market Forces\",\n            hint: `mermaid\ngraph TD;\nA[Step 1: Question Breakdown] -->|Extract key terms| A1{Identify Topic}\nA1 -->|Micro: Supply & Demand, Market Structures| A2\nA1 -->|Macro: GDP, Growth, Policy, Trade| A3\nA1 -->|Currency & Regulation| A4\nA2 --> B1[Identify model: Elasticity, Cost Curves, Shutdown Points]\nA3 --> B2[Map to AD-AS, Business Cycles, Growth Theories]\nA4 --> B3[Assess Exchange Rates, Trade, Capital Flows, Regulation]\nB1 -->|Check for formula or concept?| C{Numerical or Conceptual}\nB2 --> C\nB3 --> C\nC -->|Numerical| D1[Extract data, apply formulas, check assumptions]\nC -->|Conceptual| D2[Analyze cause-effect, policy impact]\nD1 --> E[Step 4: Solution Development]\nD2 --> E\nE -->|Construct structured response| E1(Core insight + economic rationale)\nE -->|Consider alternative scenarios| E2(Assess different possibilities)\nE1 --> F[Step 5: Answer Validation]\nE2 --> F\nF -->|Check logic, principles, and assumptions| F1(Verify consistency)\nF1 -->|Ensure completeness & clarity| F2(Confirm answer structure)`\n        },\n        \"FixedIncome\": {\n            category: \"Fixed Income Investments\",\n            hint: `mermaid\ngraph TD\nA[Purpose and Scope] --> B3[Analyze Macro Conditions]\nB --> C[Assess Bond Features]\nC --> D[Risk and Yield Analysis]\nD --> E[Develop Recommendations]\nE --> F[Review Performance]\n%% Notes and detailed steps\nA --> |Set objectives| B\nB --> |Review interest rates and inflation| C\nC --> |Focus on duration, spread| D\nD --> |Assess scenarios| E`\n        },\n        \"QuantMeth\": {\n            category: \"Quantitative Methods\",\n            hint: `mermaid\ngraph TD\nA[\"Articulating Purpose and Context\"] --> B[\"Collecting Input Data\"]\nB --> C[\"Processing and Cleaning Data\"]\nC --> D[\"Selecting Quantitative Models and Tools\"]\nD --> E[\"Estimating Parameters and Testing Hypotheses\"]\nE --> F[\"Interpreting Results and Communicating Findings\"]\nF --> G[\"Monitoring and Model Reassessment\"]`\n        },\n        \"EquityInvest\": {\n            category: \"Equity Investments\",\n            hint: `mermaid\ngraph TD\nA[Objective Setting] --> B[Market and Sector Insights]\nB --> C[Industry Competitive Analysis]\nC --> D[Company Review]\nD --> E[Valuation and Risks]\nE --> F[Investment Decision]\n%% Step-specific highlights\nB --> |Look at growth patterns| C\nC --> |Evaluate competitors' positions| D\nD --> |Check financial health| E\nE --> |Combine insights into strategy| F`\n        },\n        \"PortManage\": {\n            category: \"Portfolio Management\",\n            hint: `mermaid\ngraph TD\nA[\"Define Investment Objectives\"] --> B[\"Establish Investment Constraints\"]\nB --> C[\"Develop Strategic Asset Allocation\"]\nC --> D[\"Incorporate Tactical Adjustments\"]\nD --> E[\"Select and Optimize Securities\"]\nE --> F[\"Execute Implementation and Trading\"]\nF --> G[\"Measure Performance and Attribution\"]\nG --> H[\"Monitor Risk and Compliance\"]\nH --> I[\"Rebalance and Adjust Portfolio\"]`\n        },\n        \"Derivatives\": {\n            category: \"Derivative Instruments\",\n            hint: `mermaid\ngraph TD\nA[Define Objective and Context] --> B[Identify Derivative Instrument]\nB --> C[Understand Contract Specifications]\nC --> D[Gather Market Data]\nD --> E[Apply Valuation Models]\nE --> F[Assess Risks: Market, Counterparty, etc.]\nF --> G[Construct Payoff Diagrams or Strategies]\nG --> H[Interpret Results and Make Recommendations]\nH --> I[Review, Monitor, and Adjust Strategies]\n%% Example labels or notes (optional)\nA --> |Hedging, speculation, arbitrage| B\nC --> |Features like notional amount, expiration| D\nD --> |Market prices, volatility, risk-free rates| E\nF --> |Sensitivity to Greeks: Delta, Gamma, Vega, etc.| G\nH --> |Adjust based on changing market conditions| I`\n        },\n        \"FinancialReporting\": {\n            category: \"Financial Reporting and Analysis\",\n            hint: `mermaid\ngraph TD\nA[Articulating Purpose and Context] --> B[Collecting Input Data]\nB --> C[Processing Data]\nC --> D[Analyzing and Interpreting Processed Data]\nD --> E[Developing and Communicating Conclusions]\nE --> F[Doing Follow-Up]\nA --> |Defines goals, tools, and audience| B\nB --> |Gather data on economy and industry| C\nC --> |Use tools like ratios and charts| D\nD --> |Interpret data for conclusions| E\nF --> |Periodic review and iteration| A`\n        },\n        \"AlterInvest\": {\n            category: \"Alternative Investments\",\n            hint: `mermaid\ngraph TD\nA[\"Define Investment Objectives and Mandate\"] --> B[\"Identify Alternative Asset Classes\"]\nB --> C[\"Conduct Manager and Strategy Due Diligence\"]\nC --> D[\"Perform Valuation and Pricing Analysis\"]\nD --> E[\"Assess Risk and Liquidity\"]\nE --> F[\"Allocate Alternatives in Portfolio\"]\nF --> G[\"Monitor Performance and Rebalance\"]`\n        },\n        \"CorpIssuers\": {\n            category: \"Corporate Finance and Issuers\",\n            hint: `mermaid\ngraph TD\nA[\"Corporate Issuer Overview\"] --> B[\"Industry Classification\"]\nB --> C[\"Sector Trends and Competitive Landscape\"]\nA --> D[\"Financial Statement Analysis\"]\nD --> E[\"Profitability, Liquidity, Leverage\"]\nA --> F[\"Credit Risk Assessment\"]\nF --> G[\"Rating Agencies and Default Probabilities\"]\nA --> H[\"Capital Structure and Issuance History\"]\nH --> I[\"Bond Issuances and Debt Maturities\"]\nA --> J[\"Corporate Governance and Management\"]\nJ --> K[\"Board Quality and Managerial Competence\"]\nA --> L[\"Valuation and Investment Analysis\"]\nL --> M[\"DCF, Relative Valuation, Multiples\"]`\n        },\n        \"Ethics\": {\n            category: \"Ethical and Professional Standards\",\n            hint: `mermaid\ngraph TD\nA[Step 1: Scenario Breakdown] --> B{Identify Ethical Domain}\nB --> B1[Professionalism & Integrity]\nB --> B2[Duties to Clients]\nB --> B3[Duties to Employers]\nB --> B4[Conflicts of Interest]\nB --> B5[Investment Process & Duties]\nB --> B6[Responsibilities as CFA Member]\n\nB1 --> C[Check for Code & Standards Violations]\nB2 --> C\nB3 --> C\nB4 --> C\nB5 --> C\nB6 --> C\n\nC --> D{Nature of Issue}\nD --> D1[Misrepresentation, Misconduct, Confidentiality]\nD --> D2[Fair Dealing, Suitability, Loyalty]\nD --> D3[Compliance, Independence, Oversight]\n\nD --> E[Step 2: Ethical Reasoning]\nE --> F1[Apply relevant Standard of Conduct]\nE --> F2[Identify stakeholders and impact]\nE --> F3[Consider long-term reputation and fiduciary duties]\n\nF1 --> G[Step 3: Evaluate Options]\nF2 --> G\nF3 --> G\n\nG --> H1[Prioritize ethical action over business gain]\nG --> H2[Select most conservative, integrity-preserving action]\n\nH1 --> I[Step 4: Final Answer Validation]\nH2 --> I\n\nI --> J1[Check consistency with CFA standards]\nI --> J2[Ensure action protects client, market, and integrity]\n`\n        }\n    };\n\n    // Get input items\n    const allItems = items; // n8n JavaScript Code node uses 'items'\n\n    // Process the single input item\n    if (allItems.length === 0) {\n        return [{ json: { categoryCode: '', category: '', hint: 'error:no_input' } }];\n    }\n\n    // Assume single input as per request\n    const item = allItems[0];\n    const categoryCode = item.json.output || '';\n\n    // Look up category and hint in dictionary\n    const entry = categoryDict[categoryCode] || { category: 'Unknown', hint: 'error:category_not_found' };\n    const category = entry.category;\n    const hint = entry.hint;\n\n    // Return single item with categoryCode, category, and hint\n    return [{ json: { categoryCode, category, hint } }];\n}\n\nreturn main();"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1116,
+        -500
+      ],
+      "id": "1acfc77b-86ed-4d8e-b82b-0b57315a926a",
+      "name": "Map Category for hint"
+    },
+    {
+      "parameters": {
+        "jsCode": "const RISEORFALL_WORDS = [\n    'rise or fall', 'ขึ้นหรือลง', 'escalate or deflate', 'grow or shrink', \n    'boost or lower', 'surge or decline', 'upwards or downwards', 'ปรับตัวขึ้นหรือลง', \n    'ปรับตัวสูงขึ้นหรือต่ำลง', 'ขึ้น\"\" หรือ \"\"ลง', 'rise หรือ fall', '\"ขึ้น\" หรือ \"ลง\"'\n];\nconst MULTIPLECHOICE_WORDS = [\n    'options:', 'answer choices:', 'ตัวเลือก', 'choice', 'appropriate among the three options'\n];\n\nfunction classifyQuestionType(query) {\n    const queryLower = query.toLowerCase();\n    if (RISEORFALL_WORDS.some(keyword => queryLower.includes(keyword))) return 'Type#2';\n    if (MULTIPLECHOICE_WORDS.some(keyword => queryLower.includes(keyword))) return 'Type#1';\n    return 'Unknown';\n}\n\nfunction summarizeTrendForAiV6(block) {\n    try {\n        const lines = block.trim().split('\\n').filter(line => line.trim());\n        if (lines.length < 2) return \"error:insufficient_data\";\n        \n        // Get header and data\n        const header = lines[0].split(',').map(col => col.trim());\n        const dataRows = lines.slice(1)\n            .map(line => line.split(',').map(val => val.trim()))\n            .filter(row => row.length === header.length);\n\n        // Find closing price column\n        const closeColIdx = header.findIndex(c => c.toLowerCase().startsWith('close') || c.includes('ปิด'));\n        if (closeColIdx === -1) {\n            return \"close_col:N/A\";\n        }\n\n        // Extract closing prices\n        const closePrices = dataRows.map(row => {\n            const val = parseFloat(row[closeColIdx]);\n            if (isNaN(val)) throw new Error('invalid_close_data');\n            return val;\n        });\n\n        // Calculate percentage changes\n        const changePct = [];\n        for (let i = 1; i < closePrices.length; i++) {\n            const prev = closePrices[i - 1];\n            const curr = closePrices[i];\n            const pct = prev !== 0 ? ((curr - prev) / prev) * 100 : 0.0;\n            changePct.push(Math.round(pct * 100) / 100);\n        }\n\n        // Basic statistics\n        const totalDays = closePrices.length;\n        const avgChange = changePct.length > 0\n            ? Math.round((changePct.reduce((sum, pct) => sum + pct, 0) / changePct.length) * 100) / 100\n            : 0.0;\n        const posDays = changePct.filter(pct => pct > 0).length;\n        const negDays = changePct.filter(pct => pct < 0).length;\n        const last3 = changePct.slice(-3).concat(Array(3 - Math.min(3, changePct.length)).fill(0.0));\n        const trend = last3.reduce((sum, pct) => sum + pct, 0) > 0\n            ? 'upward'\n            : last3.reduce((sum, pct) => sum + pct, 0) < 0\n            ? 'downward'\n            : 'flat';\n\n        // Assemble summary\n        return [\n            `total_days:${totalDays}`,\n            `avg_change_pct:${avgChange}`,\n            `positive_days:${posDays}`,\n            `negative_days:${negDays}`,\n            `last_3_day_change_pct:${JSON.stringify(last3)}`,\n            `trend:${trend}`\n        ].join(' | ');\n    } catch (e) { return `error:${e.message}`; }\n}\n\nfunction extractPromptAndTimeseriesDataV6(query) {\n    if (typeof query !== 'string') {\n        return [null, null];\n    }\n\n    const lines = query.trim().split('\\n');\n    const promptLines = [];\n    const dataLines = [];\n    let inDataBlock = false;\n    let expectedColumns = 0;\n\n    const headerPattern = /(context|บริบท|บริษัทย่อย)\\s*:\\s*(.*)/i;\n    const dateRowPattern = /^\\d{4}-\\d{2}-\\d{2}/;\n\n    for (let line of lines) {\n        const stripped = line.trim();\n        \n        if (!inDataBlock) {\n            const headerMatch = headerPattern.exec(line);\n            if (headerMatch) {\n                inDataBlock = true;\n                const headerLine = headerMatch[2].trim();\n                expectedColumns = headerLine.split(',').filter(col => col.trim()).length;\n                dataLines.push(headerLine);\n            } else {\n                promptLines.push(line);\n            }\n        } else {\n            if (!stripped) continue;\n\n            if (dateRowPattern.test(stripped)) {\n                let values;\n                if (stripped.includes(':')) {\n                    try {\n                        const [datePart, valuePart] = stripped.split(':', 2);\n                        values = [datePart.trim(), ...valuePart.split(',').map(v => v.trim())];\n                    } catch {\n                        continue;\n                    }\n                } else {\n                    values = stripped.split(',').map(v => v.trim());\n                }\n\n                if (values.length === expectedColumns) {\n                    dataLines.push(values.join(', '));\n                } else {\n                    break;\n                }\n            } else {\n                break;\n            }\n        }\n    }\n\n    const prompt = promptLines.join('\\n').trim();\n    const data = dataLines.length > 1 ? dataLines.join('\\n') : null;\n    \n    return [prompt, data];\n}\n\nfunction main() {\n    const allItems = items;\n    let output = [];\n\n    for (const item of allItems) {\n        const query = item.json.query || '';\n        const itemId = item.json.id || '';\n        const itemType = classifyQuestionType(query);\n        const itemData = { id: itemId, query, type: itemType };\n\n        if (itemType === 'Type#1') {\n            output.push({ json: itemData });\n        } else if (itemType === 'Type#2') {\n            const [prompt, timeseriesData] = extractPromptAndTimeseriesDataV6(query);\n            if (prompt && timeseriesData) {\n                const summary = summarizeTrendForAiV6(timeseriesData);\n                itemData.query = `${prompt}\\n\\n${summary}`;\n                output.push({ json: itemData });\n            }\n        }\n    }\n    return output;\n}\n\nreturn main();"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        300,
+        -120
+      ],
+      "id": "16a9766c-a70d-4bb4-a3c5-849ff7f8c55e",
+      "name": "Classifier (T1,T2)"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOllama",
+      "typeVersion": 1,
+      "position": [
+        828,
+        -280
+      ],
+      "id": "2a99989c-c6cf-4f27-b4d0-3427b5e861e4",
+      "name": "Ollama Chat Model",
+      "credentials": {
+        "ollamaApi": {
+          "id": "o4i8NOiosLfaOfWt",
+          "name": "Ollama account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOllama",
+      "typeVersion": 1,
+      "position": [
+        1644,
+        245
+      ],
+      "id": "949e8222-3c2e-41c8-afc8-e6ac836615eb",
+      "name": "Ollama Chat Model1",
+      "credentials": {
+        "ollamaApi": {
+          "id": "o4i8NOiosLfaOfWt",
+          "name": "Ollama account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -580,
+        -225
+      ],
+      "id": "c4a95751-7e49-4e79-8bf2-bf75f6cbae53",
+      "name": "When clicking ‘Execute workflow’"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Google Drive": {
+      "main": [
+        [
+          {
+            "node": "Extract from File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract from File": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Convert to File": {
+      "main": [
+        []
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Replace Me",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [
+          {
+            "node": "Convert to File",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Classifier (T1,T2)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Replace Me": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "T1 answerer": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "T2 prediction": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "DeepSeek Chat Model2": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "T1 answerer",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "T1 Classifier",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ],
+        [
+          {
+            "node": "T2 prediction",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "T1 answerer",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "T1 Classifier": {
+      "main": [
+        [
+          {
+            "node": "Map Category for hint",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Classifier (T1,T2)": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Map Category for hint": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ollama Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "T1 Classifier",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ollama Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "T2 prediction",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Google Drive",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "1d06bb5d-7480-4797-a4fa-1aff2add5d0a",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "967bd6a62cdbbb23ba3d38ac70f08fccf5890e6e7d6fb52af35f1762c60f2a0d"
+  },
+  "id": "r1XZd6jZO4rwltN7",
+  "tags": []
+}
