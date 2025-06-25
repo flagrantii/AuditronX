@@ -36,7 +36,7 @@ To get started with this project, follow these steps:
 
    ```
 
-2. Set up n8n by following [n8n documentation](https://n8n.io/docs/).
+2. Set up n8n by following [n8n documentation](https://docs.n8n.io/).
 
 3. Import the AudithonX_round1.json workflow into your n8n instance.
 
