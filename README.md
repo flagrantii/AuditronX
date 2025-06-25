@@ -21,7 +21,7 @@ The project consists of the following key components:
 
    - A JavaScript file containing a dictionary to map financial categories to their respective hints for structured problem-solving.
 
-4. **`workflow_image.png`**:
+4. **`n8n_workflow.png`**:
    - An image file illustrating the workflow diagram for easy visualization of the n8n process.
 
 ## Getting Started
